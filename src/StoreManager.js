@@ -1,8 +1,17 @@
 export default class StoreManager {
   constructor() {
+    if (!this.mode) this.mode = 'RGB';
     if (!this.red) this.red = 0;
     if (!this.green) this.green = 0;
     if (!this.blue) this.blue = 0;
+  }
+
+  get mode() {
+    return window.localStorage.getItem('mode');
+  }
+
+  set mode(value) {
+    window.localStorage.setItem('mode', value);
   }
 
   get red() {
@@ -22,7 +31,7 @@ export default class StoreManager {
   }
 
   get blue() {
-    return winddow.localStorage.getItem('blue');
+    return window.localStorage.getItem('blue');
   }
 
   set blue(value) {

@@ -1,23 +1,34 @@
 import React from "react";
+import { applyStyles } from "../helpers";
 import colors from "../colors";
+import universalStyles from "../universal-styles";
 
 class NavLink extends React.Component {
   constructor() {
     super();
 
     this._initStyles = {
+      ...universalStyles,
       padding: "0.5em 1em",
-      backgroundColor: "inherit",
       fontSize: "inherit",
       fontFamily: "inherit",
-      color: "inherit",
       textDecoration: "none",
+      ...colors.navLink.inactive,
     };
   }
 
   render() {
+    let classes = ["nav-link"];
+
+    if (this.props.active) {
+      this._initStyles.backgroundColor = colors.navLink.active.backgroundColor;
+      this._initStyles.color = colors.navLink.active.color;
+      classes.push("active");
+    }
+
     this._anchor = (
       <a
+        className={classes.join(" ")}
         style={this._initStyles}
         href={this.props.href}
         onClick={this.props.onClick}
@@ -32,13 +43,17 @@ class NavLink extends React.Component {
   }
 
   _onMouseEnter(event) {
-    event.target.style.backgroundColor = colors.header.fg;
-    event.target.style.color = colors.header.bg;
+    const anchor = event.target;
+    if (!anchor.classList.contains("active")) {
+      applyStyles(anchor, colors.navLink.active);
+    }
   }
 
   _onMouseLeave(event) {
-    event.target.style.backgroundColor = "inherit";
-    event.target.style.color = "inherit";
+    const anchor = event.target;
+    if (!anchor.classList.contains("active")) {
+      applyStyles(anchor, colors.navLink.inactive);
+    }
   }
 }
 

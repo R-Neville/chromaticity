@@ -1,11 +1,15 @@
 import React from "react";
+import universalStyles from "../universal-styles";
 
 class Page extends React.Component {
   constructor() {
     super();
 
     this._initStyles = {
+      ...universalStyles,
       flexDirection: "column",
+      alignItems: "center",
+      padding: "1em",
       width: "100%",
       height: "100%",
     };
