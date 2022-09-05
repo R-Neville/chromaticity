@@ -41,13 +41,13 @@ class Slider extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ mounted: true });
     const slider = document.getElementById(this._id);
     const thumb = slider.querySelector('.thumb');
     this._resizeObserver = new ResizeObserver(() => {
       thumb.style.left = this.state.value * this.stepSize + 'px'
     });
     this._resizeObserver.observe(slider);
+    this.setState({ mounted: true });
   }
 
   render() {
