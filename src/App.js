@@ -48,6 +48,17 @@ class App extends React.Component {
     this._activeLinkStyles = {};
   }
 
+  componentDidMount() {
+    const appHeading = document.querySelector('header h1');
+    window.addEventListener('resize', () => {
+      if (window.innerWidth < 580) {
+        appHeading.style.display = 'none';
+      } else {
+        appHeading.style.display = 'block';
+      }
+    });
+  }
+
   render() {
     return (
       <div style={this._initStyles}>

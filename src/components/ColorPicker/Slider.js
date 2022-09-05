@@ -73,6 +73,7 @@ class Slider extends React.Component {
             backgroundColor: "#000",
           }}
           onMouseDown={this._onThumbMouseDown.bind(this)}
+          onTouchStart={this._onThumbTouchStart.bind(this)}
         ></div>
       </div>
     );
@@ -107,6 +108,37 @@ class Slider extends React.Component {
     document.body.style.userSelect = "none";
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
+  }
+
+  _onThumbTouchStart(event) {
+    const thumb = event.target;
+    let startX = event.pageX;
+    const onTouchMove = (e) => {
+      const deltaX = e.pageX - startX;
+      let closestStep;
+      if (thumb.offsetLeft + deltaX < 0) {
+        closestStep = -thumb.offsetLeft;
+      } else if (thumb.offsetLeft + deltaX > this.usableWidth) {
+        closestStep = this.usableWidth - thumb.offsetLeft;
+      } else {
+        closestStep = deltaX - (deltaX % this.stepSize);
+      }
+      const newOffset = thumb.offsetLeft + closestStep;
+      thumb.style.left = newOffset + "px";
+      const newValue = Math.round(newOffset / this.stepSize);
+      this.setState({ value: newValue });
+      this._notifyUpdates(newValue);
+      startX += closestStep;
+    };
+    const onTouchEnd = () => {
+      document.body.style.userSelect = "all";
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", onTouchEnd);
+    };
+
+    document.body.style.userSelect = "none";
+    document.addEventListener("touchmove", onTouchMove);
+    document.addEventListener("touchend", onTouchEnd);
   }
 
   _notifyUpdates(value) {

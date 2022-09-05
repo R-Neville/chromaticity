@@ -17,14 +17,14 @@ class Header extends React.Component {
       fontSize: "inherit",
       fontFamily: "inherit",
       ...colors.header,
-      userSelect: 'none'
+      userSelect: "none",
     };
   }
 
   render() {
     return (
       <header style={this._initStyles}>
-        <h1 style={{marginRight: 'auto'}}>Chormaticity</h1>
+        <h1 style={{ margin: 0, marginRight: "auto" }}>Chormaticity</h1>
         <Nav linkItems={this.props.linkItems} />
       </header>
     );
