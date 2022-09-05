@@ -50,6 +50,9 @@ class App extends React.Component {
 
   componentDidMount() {
     const appHeading = document.querySelector('header h1');
+    if (window.innerWidth < 580) {
+      appHeading.style.display = 'none';
+    }
     window.addEventListener('resize', () => {
       if (window.innerWidth < 580) {
         appHeading.style.display = 'none';

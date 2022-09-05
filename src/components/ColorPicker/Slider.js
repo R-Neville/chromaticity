@@ -2,7 +2,7 @@ import React from "react";
 import universalStyles from "../../universal-styles";
 
 const NUMBER_OF_STEPS = 255; // Max RGB value
-const THUMB_WIDTH = 7;
+const THUMB_WIDTH = 10;
 
 class Slider extends React.Component {
   constructor(props) {
@@ -65,7 +65,7 @@ class Slider extends React.Component {
           style={{
             ...universalStyles,
             position: "absolute",
-            width: "7px",
+            width: "10px",
             height: "100%",
             left: this.state.mounted ? this.state.value * this.stepSize + 'px' : '0px',
             border: "1px solid #FFF",
@@ -112,9 +112,9 @@ class Slider extends React.Component {
 
   _onThumbTouchStart(event) {
     const thumb = event.target;
-    let startX = event.pageX;
+    let startX = event.targetTouches[0].pageX;
     const onTouchMove = (e) => {
-      const deltaX = e.pageX - startX;
+      const deltaX = e.targetTouches[0].pageX - startX;
       let closestStep;
       if (thumb.offsetLeft + deltaX < 0) {
         closestStep = -thumb.offsetLeft;
