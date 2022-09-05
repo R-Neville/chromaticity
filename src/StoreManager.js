@@ -1,7 +1,8 @@
-const MODE_KEY = 'mode';
-const RED_KEY = 'red';
-const GREEN_KEY = 'green';
-const BLUE_KEY = 'blue';
+const MODE_KEY = "mode";
+const RED_KEY = "red";
+const GREEN_KEY = "green";
+const BLUE_KEY = "blue";
+const PALETTES_KEY = "palettes";
 
 export default class StoreManager {
   constructor() {
@@ -9,6 +10,7 @@ export default class StoreManager {
     if (!this.red) this.red = 0;
     if (!this.green) this.green = 0;
     if (!this.blue) this.blue = 0;
+    if (!this.palettes) this.palettes = [];
   }
 
   get mode() {
@@ -62,9 +64,23 @@ export default class StoreManager {
   get fullHEX() {
     return `#${this.redHEX}${this.greenHEX}${this.blueHEX}`;
   }
+
+  get palettes() {
+    return JSON.parse(window.localStorage.getItem(PALETTES_KEY));
+  }
+
+  set palettes(newValue) {
+    window.localStorage.setItem(PALETTES_KEY, JSON.stringify(newValue));
+  }
+
+  addPalette(newPalette) {
+    const palettes = this.palettes;
+    palettes.push(newPalette);
+    this.palettes = palettes;
+  }
 }
 
 function hexStringFromInt(int) {
   const hexString = int.toString(16);
-  return hexString.length === 1 ? "0" + hexString : hexString;
+  return (hexString.length === 1 ? "0" + hexString : hexString).toUpperCase();
 }

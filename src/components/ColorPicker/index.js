@@ -1,4 +1,5 @@
 import React from "react";
+import { applyStyles } from "../../helpers";
 import colors from "../../colors";
 import StoreManager from "../../StoreManager";
 import TabBar from "../TabBar";
@@ -6,6 +7,8 @@ import universalStyles from "../../universal-styles";
 import ColorPreview from "./ColorPreview";
 import ClipboardInput from "./ClipboardInput";
 import ColorControl from "./ColorControl";
+import Action from "./Action";
+import Modal from "../../custom-html-components/Modal";
 
 const RGB_MODE = "RGB";
 const HEX_MODE = "HEX";
@@ -40,6 +43,7 @@ class ColorPicker extends React.Component {
       ...universalStyles,
       display: "flex",
       flexDirection: "column",
+      paddingBottom: "1em",
       width: "100%",
       maxWidth: "350px",
       border: `2px solid ${colors.colorPicker.color}`,
@@ -91,12 +95,18 @@ class ColorPicker extends React.Component {
           mode={this.state.mode}
         />
         <ClipboardInput value={this.state.colorString} text="Copy" />
+        <Action
+          text={"New Palette"}
+          onClick={this._onNewPaletteActionClick.bind(this)}
+        />
+        <Action text={"Add To Palette"} />
+        <Action text={"Add To Favorites"} />
       </div>
     );
   }
 
   componentDidMount() {
-    const picker = document.getElementById("picker");
+    const picker = this._rootEl();
     picker.addEventListener(
       "color-slider-changed",
       this._onColorSliderChanged.bind(this)
@@ -105,6 +115,11 @@ class ColorPicker extends React.Component {
       "color-input-changed",
       this._onColorInputChanged.bind(this)
     );
+    picker.addEventListener("color-copied", this._onColorCopied.bind(this));
+  }
+
+  _rootEl() {
+    return document.getElementById("color-picker");
   }
 
   _onColorSliderChanged(event) {
@@ -128,6 +143,45 @@ class ColorPicker extends React.Component {
     }
 
     window.location.reload(false); // Hacky fix...
+  }
+
+  _onColorCopied() {
+    this._showMessage("Color copied to clipboard!");
+  }
+
+  _onNewPaletteActionClick() {
+    const message = "Enter a name for your new palette:";
+    const onBlur = (event) => {
+      const value = event.target.value;
+      let valid = true;
+      if (value.length === 0) valid = false;
+      const palettes = this._storeManager.palettes;
+      const found = palettes.filter((p) => {
+        return p.name === value;
+      });
+      if (found.length > 0) valid = false;
+
+      if (valid) {
+        event.target.dispatchEvent(
+          new CustomEvent("unlock", { bubbles: true })
+        );
+      } else {
+        event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
+      }
+    };
+
+    const onConfirm = (value) => {
+      const newPalette = {
+        name: value,
+        colors: [],
+      };
+      this._storeManager.addPalette(newPalette);
+      const message = `Palette '${value}' created!`;
+      this._showMessage(message);
+    };
+
+    const modal = new Modal(message, onConfirm.bind(this), onBlur.bind(this));
+    document.body.appendChild(modal);
   }
 
   _updateColorValue(colorName, newValue) {
@@ -172,6 +226,41 @@ class ColorPicker extends React.Component {
       mode: RGB_MODE,
       colorString: this._storeManager.fullRGB,
     });
+  }
+
+  _showMessage(text, error) {
+    const picker = this._rootEl();
+    let flashDiv = picker.querySelector(".flash");
+    if (flashDiv) flashDiv.remove();
+    flashDiv = document.createElement("div");
+    flashDiv.classList.add("flash");
+    flashDiv.textContent = text;
+    applyStyles(flashDiv, {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "0.5em",
+      margin: "0.5em 1em",
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderRadius: "3px",
+    });
+    if (error) {
+      applyStyles(flashDiv, {
+        ...colors.flashMessage.error,
+      });
+    } else {
+      applyStyles(flashDiv, {
+        ...colors.flashMessage.success,
+      });
+    }
+
+    const firstAction = picker.querySelector(".action");
+    picker.insertBefore(flashDiv, firstAction);
+
+    setTimeout(() => {
+      flashDiv.remove();
+    }, 3000);
   }
 }
 

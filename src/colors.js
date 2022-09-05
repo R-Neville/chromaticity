@@ -1,6 +1,10 @@
 
 const DARK = '#000';
 const LIGHT = '#FFF';
+const ERROR_BG = '#F5B7B1';
+const ERROR_FG = '#C0392B';
+const SUCCESS_BG = '#A9DFBF';
+const SUCCESS_FG = '#229954';
 
 const colors = {
   app: {
@@ -44,6 +48,18 @@ const colors = {
   clipbaordInput: {
     backgroundColor: LIGHT,
     color: DARK
+  },
+  flashMessage: {
+    error: {
+      backgroundColor: ERROR_BG,
+      color: ERROR_FG,
+      borderColor: ERROR_FG
+    },
+    success: {
+      backgroundColor: SUCCESS_BG,
+      color: SUCCESS_FG,
+      borderColor: SUCCESS_FG
+    }
   }
 };
 

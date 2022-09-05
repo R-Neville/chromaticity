@@ -55,6 +55,8 @@ class ClipboardInput extends React.Component {
     readOnlyInput.select();
     readOnlyInput.setSelectionRange(0, 99999);
     window.navigator.clipboard.writeText(readOnlyInput.value);
+    parent.dispatchEvent(new CustomEvent('color-copied', { bubbles: true }));
+    console.log("copy");
   }
 }
 

@@ -60,7 +60,7 @@ class ColorInput extends React.Component {
 
 function rgbToHex(rgbValue) {
   const hex = rgbValue.toString(16);
-  return hex.length === 1 ? "0" + hex : hex;
+  return (hex.length === 1 ? "0" + hex : hex).toUpperCase();
 }
 
 export default ColorInput;
