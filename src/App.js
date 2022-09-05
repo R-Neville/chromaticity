@@ -16,7 +16,8 @@ class App extends React.Component {
       flexDirection: "column",
       padding: 0,
       width: "100%",
-      height: "100%",
+      height: "100vg",
+      minHeight: "100vh",
       margin: 0,
       fontSize: "1em",
       fontFamily: "Arial",
@@ -51,11 +52,11 @@ class App extends React.Component {
     return (
       <div style={this._initStyles}>
         <Header linkItems={this._linkItems} />
-        <main>
-          <Page 
-            rootId={"picker"} 
-            display={"flex"} 
-            children={this._buildPickerPage()} 
+        <main style={{ flexGrow: 1 }}>
+          <Page
+            rootId={"picker"}
+            display={"flex"}
+            children={this._buildPickerPage()}
           />
           <Page
             rootId={"palettes"}
@@ -91,21 +92,15 @@ class App extends React.Component {
   }
 
   _buildPickerPage() {
-    return (
-      <ColorPicker/>
-    );
+    return <ColorPicker />;
   }
 
   _buildPalettesPage() {
-    return (
-      <h1>palettes</h1>
-    );
+    return <h1>palettes</h1>;
   }
 
   _buildFavoritesPage() {
-    return (
-      <h1>favorites</h1>
-    );
+    return <h1>favorites</h1>;
   }
 }
 

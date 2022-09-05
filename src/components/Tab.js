@@ -3,8 +3,8 @@ import colors from "../colors";
 import universalStyles from "../universal-styles";
 
 class Tab extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,
@@ -16,23 +16,26 @@ class Tab extends React.Component {
       backgroundColor: "inherit",
       color: "inherit",
       cursor: "pointer",
-      userSelect: "none",
-      ...colors.tab.inactive,
+      userSelect: "none"
     };
+
+    this._classes = new Set([...this.props.classes, "tab"]);
   }
 
   render() {
-    this.props.classes.push("tab");
     if (this.props.active) {
-      this._initStyles.backgroundColor = colors.tab.active.backgroundColor;
-      this._initStyles.color = colors.tab.active.color;
-      this.props.classes.push("active");
+      this._classes.add("active");
+    } else {
+      this._classes.delete("active");
     }
 
     return (
       <div
-        className={this.props.classes.join(" ")}
-        style={this._initStyles}
+        className={[...this._classes].join(" ")}
+        style={{
+          ...this._initStyles,
+          ...(this.props.active ? colors.tab.active : colors.tab.inactive)
+        }}
         onClick={this.props.onClick}
       >
         {this.props.text}

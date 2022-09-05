@@ -4,12 +4,13 @@ import Nav from "./Nav";
 import universalStyles from "../universal-styles";
 
 class Header extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,
       display: "flex",
+      justifyContent: "center",
       alignItems: "center",
       padding: "1em",
       boxSizing: "border-box",
@@ -22,7 +23,7 @@ class Header extends React.Component {
   render() {
     return (
       <header style={this._initStyles}>
-        <h1>Chormaticity</h1>
+        <h1 style={{marginRight: 'auto'}}>Chormaticity</h1>
         <Nav linkItems={this.props.linkItems} />
       </header>
     );

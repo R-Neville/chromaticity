@@ -1,42 +1,49 @@
 
-const dark = '#000';
-const light = '#FFF';
+const DARK = '#000';
+const LIGHT = '#FFF';
 
 const colors = {
   app: {
-    backgroundColor: light,
-    color: dark
+    backgroundColor: LIGHT,
+    color: DARK
   },
   header: {
-    backgroundColor: dark,
-    color: light
+    backgroundColor: DARK,
+    color: LIGHT
   },
   navLink: {
     active: {
-      backgroundColor: light,
-      color: dark
+      backgroundColor: LIGHT,
+      color: DARK
     },
     inactive: {
-      backgroundColor: dark,
-      color: light
+      backgroundColor: DARK,
+      color: LIGHT
     }
   },
   colorPicker: {
-    backgroundColor: light,
-    color: dark
+    backgroundColor: LIGHT,
+    color: DARK
   },
   tabBar: {
-    backgroundColor: dark
+    backgroundColor: DARK
   },
   tab: {
     active: {
-      backgroundColor: light,
-      color: dark
+      backgroundColor: LIGHT,
+      color: DARK
     },
     inactive: {
-      backgroundColor: dark,
-      color: light
+      backgroundColor: DARK,
+      color: LIGHT
     }
+  },
+  preview: {
+    default: DARK
+  },
+  clipbaordInput: {
+    backgroundColor: LIGHT,
+    color: DARK
   }
 };
 

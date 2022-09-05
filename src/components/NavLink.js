@@ -4,8 +4,8 @@ import colors from "../colors";
 import universalStyles from "../universal-styles";
 
 class NavLink extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,

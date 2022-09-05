@@ -2,8 +2,8 @@ import React from "react";
 import universalStyles from "../universal-styles";
 
 class Page extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,

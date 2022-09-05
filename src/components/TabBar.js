@@ -4,8 +4,8 @@ import universalStyles from "../universal-styles";
 import Tab from "./Tab";
 
 class TabBar extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,

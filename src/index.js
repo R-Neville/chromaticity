@@ -20,3 +20,16 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+window.addEventListener("resize", () => {
+  const appHeading = document.querySelector("header h1");
+  if (window.innerWidth <= 500) {
+    appHeading.classList.add("hidden");
+    appHeading.style.display = "none";
+  } else {
+    if (appHeading.classList.contains("hidden")) {
+      appHeading.classList.remove("heading");
+      appHeading.style.display = "block";
+    }
+  }
+});

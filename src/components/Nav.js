@@ -4,14 +4,13 @@ import colors from "../colors";
 import universalStyles from "../universal-styles";
 
 class Nav extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this._initStyles = {
       ...universalStyles,
       display: "flex",
       alignItems: "center",
-      marginLeft: "auto",
       borderBottom: `1px solid ${colors.header.color}`,
       backgroundColor: "inherit",
       fontSize: "inherit",
