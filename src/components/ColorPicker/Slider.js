@@ -22,6 +22,7 @@ class Slider extends React.Component {
       height: "30px",
       border: "1px solid #000",
       borderRadius: "3px",
+      marginRight: '5px',
       background: `linear-gradient(to right, black, ${this.props.bg})`,
     };
   }
@@ -48,6 +49,12 @@ class Slider extends React.Component {
     });
     this._resizeObserver.observe(slider);
     this.setState({ mounted: true });
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    return {
+      value: nextProps.value
+    };
   }
 
   render() {

@@ -19,14 +19,16 @@ class ColorPicker extends React.Component {
 
     this._storeManager = new StoreManager();
 
+    const mode = this._storeManager.mode;
     let colorString;
-    if (this._storeManager.mode === RGB_MODE) {
+    if (mode === RGB_MODE) {
       colorString = this._storeManager.fullRGB;
     } else {
       colorString = this._storeManager.fullHEX;
     }
 
     this.state = {
+      mode,
       colorString,
       previewColor: this._storeManager.fullHEX,
       red: this._storeManager.red,
@@ -72,18 +74,21 @@ class ColorPicker extends React.Component {
           bg={RED_KEY}
           colorName={RED_KEY}
           value={this.state.red}
+          mode={this.state.mode}
         />
         <ColorControl
           sliderID={`${GREEN_KEY}-slider`}
           bg={GREEN_KEY}
           colorName={GREEN_KEY}
           value={this.state.green}
+          mode={this.state.mode}
         />
         <ColorControl
           sliderID={`${BLUE_KEY}-slider`}
           bg={BLUE_KEY}
           colorName={BLUE_KEY}
           value={this.state.blue}
+          mode={this.state.mode}
         />
         <ClipboardInput value={this.state.colorString} text="Copy" />
       </div>
@@ -96,16 +101,42 @@ class ColorPicker extends React.Component {
       "color-slider-changed",
       this._onColorSliderChanged.bind(this)
     );
+    picker.addEventListener(
+      "color-input-changed",
+      this._onColorInputChanged.bind(this)
+    );
   }
 
   _onColorSliderChanged(event) {
     const { colorName, newValue } = event.detail;
+    this._updateColorValue(colorName, newValue);
+  }
+
+  _onColorInputChanged(event) {
+    const { colorName, value } = event.detail;
+    const mode = this.state.mode;
+    let newValue;
+    if (mode === RGB_MODE && value.match(/^[0-9]{1,3}$/)) {
+      newValue = parseInt(value);
+    }
+    if (mode === HEX_MODE && value.match(/^[0-9a-fA-F]{1,2}$/)) {
+      newValue = parseInt(value, 16);
+    }
+    if (newValue !== undefined) {
+      this._updateColorValue(colorName, newValue);
+      return;
+    }
+
+    window.location.reload(false); // Hacky fix...
+  }
+
+  _updateColorValue(colorName, newValue) {
     this._storeManager[colorName] = newValue;
     this.setState({
       [colorName]: newValue,
       previewColor: this._storeManager.fullHEX,
       colorString:
-        this._storeManager.mode === RGB_MODE
+        this.state.mode === RGB_MODE
           ? this._storeManager.fullRGB
           : this._storeManager.fullHEX,
     });
@@ -130,6 +161,7 @@ class ColorPicker extends React.Component {
   _switchToHEX() {
     this._storeManager.mode = HEX_MODE;
     this.setState({
+      mode: HEX_MODE,
       colorString: this._storeManager.fullHEX,
     });
   }
@@ -137,6 +169,7 @@ class ColorPicker extends React.Component {
   _switchToRGB() {
     this._storeManager.mode = RGB_MODE;
     this.setState({
+      mode: RGB_MODE,
       colorString: this._storeManager.fullRGB,
     });
   }

@@ -23,7 +23,7 @@ class ColorControl extends React.Component {
           bg={this.props.bg}
           value={this.props.value}
         />
-        <ColorInput value={this.props.value} colorName={this.props.colorName}/>
+        <ColorInput key={this.props.mode} mode={this.props.mode} value={this.props.value} colorName={this.props.colorName}/>
       </div>
     );
   }
