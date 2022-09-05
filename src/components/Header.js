@@ -17,6 +17,7 @@ class Header extends React.Component {
       fontSize: "inherit",
       fontFamily: "inherit",
       ...colors.header,
+      userSelect: 'none'
     };
   }
 

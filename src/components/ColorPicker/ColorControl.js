@@ -1,19 +1,29 @@
-import React from 'react';
+import React from "react";
+import universalStyles from "../../universal-styles";
+import ColorInput from "./ColorInput";
+import Slider from "./Slider";
 
-class ColorControl extends ReactComponent {
+class ColorControl extends React.Component {
   constructor(props) {
-    super(props)
-  
+    super(props);
+
     this._initStyles = {
-      display: 'flex',
-      margin: '0.5em 1em'
+      ...universalStyles,
+      display: "flex",
+      margin: "0.5em 1em",
     };
   }
 
   render() {
     return (
       <div style={this._initStyles}>
-
+        <Slider
+          id={this.props.sliderID}
+          colorName={this.props.colorName}
+          bg={this.props.bg}
+          value={this.props.value}
+        />
+        <ColorInput value={this.props.value} colorName={this.props.colorName}/>
       </div>
     );
   }

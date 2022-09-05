@@ -5,9 +5,13 @@ import TabBar from "../TabBar";
 import universalStyles from "../../universal-styles";
 import ColorPreview from "./ColorPreview";
 import ClipboardInput from "./ClipboardInput";
+import ColorControl from "./ColorControl";
 
 const RGB_MODE = "RGB";
 const HEX_MODE = "HEX";
+const RED_KEY = "red";
+const GREEN_KEY = "green";
+const BLUE_KEY = "blue";
 
 class ColorPicker extends React.Component {
   constructor() {
@@ -24,10 +28,11 @@ class ColorPicker extends React.Component {
 
     this.state = {
       colorString,
-      previewColor: this._storeManager.fullHEX
+      previewColor: this._storeManager.fullHEX,
+      red: this._storeManager.red,
+      green: this._storeManager.green,
+      blue: this._storeManager.blue,
     };
-
-    this._previewColor = this._storeManager.fullHEX;
 
     this._initStyles = {
       ...universalStyles,
@@ -38,6 +43,7 @@ class ColorPicker extends React.Component {
       border: `2px solid ${colors.colorPicker.color}`,
       borderRadius: "3px",
       backgroundColor: colors.colorPicker.backgroundColor,
+      userSelect: "none",
     };
 
     this._tabItems = [
@@ -61,17 +67,54 @@ class ColorPicker extends React.Component {
       <div id="color-picker" style={this._initStyles}>
         <TabBar tabItems={this._tabItems} />
         <ColorPreview color={this.state.previewColor} />
-        <div style={{ padding: "0 1em", marginBottom: "1em" }}>
-          <ClipboardInput key={this.state.colorString} value={this.state.colorString} text="Copy" />
-        </div>
+        <ColorControl
+          sliderID={`${RED_KEY}-slider`}
+          bg={RED_KEY}
+          colorName={RED_KEY}
+          value={this.state.red}
+        />
+        <ColorControl
+          sliderID={`${GREEN_KEY}-slider`}
+          bg={GREEN_KEY}
+          colorName={GREEN_KEY}
+          value={this.state.green}
+        />
+        <ColorControl
+          sliderID={`${BLUE_KEY}-slider`}
+          bg={BLUE_KEY}
+          colorName={BLUE_KEY}
+          value={this.state.blue}
+        />
+        <ClipboardInput value={this.state.colorString} text="Copy" />
       </div>
     );
+  }
+
+  componentDidMount() {
+    const picker = document.getElementById("picker");
+    picker.addEventListener(
+      "color-slider-changed",
+      this._onColorSliderChanged.bind(this)
+    );
+  }
+
+  _onColorSliderChanged(event) {
+    const { colorName, newValue } = event.detail;
+    this._storeManager[colorName] = newValue;
+    this.setState({
+      [colorName]: newValue,
+      previewColor: this._storeManager.fullHEX,
+      colorString:
+        this._storeManager.mode === RGB_MODE
+          ? this._storeManager.fullRGB
+          : this._storeManager.fullHEX,
+    });
   }
 
   _onTabClick(event) {
     const tab = event.target;
     if (tab.classList.contains("active")) return;
-    if (tab.classList.contains("RGB")) {
+    if (tab.classList.contains(RGB_MODE)) {
       this._tabItems[0].active = true;
       this._tabItems[1].active = false;
       this._colorString = this._storeManager.fullRGB;
@@ -87,14 +130,14 @@ class ColorPicker extends React.Component {
   _switchToHEX() {
     this._storeManager.mode = HEX_MODE;
     this.setState({
-      colorString: this._storeManager.fullHEX
+      colorString: this._storeManager.fullHEX,
     });
   }
 
   _switchToRGB() {
     this._storeManager.mode = RGB_MODE;
     this.setState({
-      colorString: this._storeManager.fullRGB
+      colorString: this._storeManager.fullRGB,
     });
   }
 }

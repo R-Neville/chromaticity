@@ -10,10 +10,10 @@ class ClipboardInput extends React.Component {
     this._initStyles = {
       ...universalStyles,
       display: "flex",
-      width: "100%",
       height: "30px",
       border: `1px solid ${colors.clipbaordInput.color}`,
       borderRadius: "3px",
+      margin: '0.5em 1em'
     };
   }
 

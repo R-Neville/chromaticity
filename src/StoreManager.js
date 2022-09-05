@@ -20,7 +20,7 @@ export default class StoreManager {
   }
 
   get red() {
-    return window.localStorage.getItem(RED_KEY);
+    return parseInt(window.localStorage.getItem(RED_KEY));
   }
 
   set red(value) {
@@ -32,7 +32,7 @@ export default class StoreManager {
   }
 
   get green() {
-    return window.localStorage.getItem(GREEN_KEY);
+    return parseInt(window.localStorage.getItem(GREEN_KEY));
   }
 
   set green(value) {
@@ -44,7 +44,7 @@ export default class StoreManager {
   }
 
   get blue() {
-    return window.localStorage.getItem(BLUE_KEY);
+    return parseInt(window.localStorage.getItem(BLUE_KEY));
   }
 
   set blue(value) {

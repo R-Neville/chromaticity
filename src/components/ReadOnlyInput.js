@@ -5,10 +5,6 @@ class ReadOnlyInput extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      value: this.props.value
-    };
-
     this._initStyles = {
       ...universalStyles,
       width: "100%",
@@ -25,7 +21,8 @@ class ReadOnlyInput extends React.Component {
       <input
         className="read-only"
         style={this._initStyles}
-        value={this.state.value}
+        key={this.props.value}
+        value={this.props.value}
         disabled
       />
     );
