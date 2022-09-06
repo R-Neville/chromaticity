@@ -9,7 +9,7 @@ class Selector extends HTMLElement {
     this._options = [];
 
     options.forEach(option => {
-      this.appendChild(this._buildOptionEl(option));
+      this._addOption(option);
     });
 
     applyStyles(this, {
@@ -24,10 +24,12 @@ class Selector extends HTMLElement {
     });
   }
 
-  _buildOptionEl(option) {
+  _addOption(option) {
     const el = document.createElement("div");
     el.textContent = option;
     el.title = option;
+    this._options.push(el);
+    this.appendChild(el);
     applyStyles(el, {
       ...universalStyles,
       overflow: "hidden",
@@ -54,8 +56,11 @@ class Selector extends HTMLElement {
     });
     el.addEventListener("click", () => {
       this._options.forEach((option) => {
-        if (option.classList.contains("selected"))
+        if (option.classList.contains("selected")) {
           option.classList.remove("selected");
+          option.style.backgroundColor = colors.app.backgroundColor;
+          option.style.color = colors.app.color;
+        }
       });
       el.classList.add("selected");
       el.style.backgroundColor = colors.app.color;
@@ -68,7 +73,6 @@ class Selector extends HTMLElement {
       });
       this.dispatchEvent(customEvent);
     });
-    return el;
   }
 }
 
