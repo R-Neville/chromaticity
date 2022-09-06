@@ -125,11 +125,13 @@ class ColorPicker extends React.Component {
   }
 
   _onColorSliderChanged(event) {
+    event.stopImmediatePropagation();
     const { colorName, newValue } = event.detail;
     this._updateColorValue(colorName, newValue);
   }
 
   _onColorInputChanged(event) {
+    event.stopImmediatePropagation();
     const { colorName, value } = event.detail;
     const mode = this.state.mode;
     let newValue;
@@ -147,7 +149,8 @@ class ColorPicker extends React.Component {
     window.location.reload(false); // Hacky fix...
   }
 
-  _onColorCopied() {
+  _onColorCopied(event) {
+    event.stopImmediatePropagation();
     this._showMessage("Color copied to clipboard!");
   }
 

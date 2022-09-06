@@ -107,6 +107,15 @@ export default class StoreManager {
     });
     this.palettes = palettes;
   }
+
+  removeColorFromPalette(color, paletteName) {
+    const palettes = this.palettes;
+    const palette = palettes.filter(p => p.name === paletteName)[0];
+    palette.colors.splice(palette.colors.indexOf(color), 1);
+    palettes.splice(palettes.indexOf(palette), 1, palette);
+    this.palettes = palettes;
+    return palette;
+  }
 }
 
 function hexStringFromInt(int) {

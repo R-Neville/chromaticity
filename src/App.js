@@ -9,6 +9,7 @@ import PalettesView from "./components/PalettesView";
 import StoreManager from "./StoreManager";
 import Modal from "./custom-html-components/Modal";
 import Footer from "./components/Footer";
+import PaletteView from "./custom-html-components/PaletteView";
 
 const PICKER = "picker";
 const PALETTES = "palettes";
@@ -19,8 +20,8 @@ class App extends React.Component {
     super();
 
     this._storeManager = new StoreManager();
-
     this._modal = null;
+    this._paletteView = null;
 
     this._initStyles = {
       ...universalStyles,
@@ -94,6 +95,21 @@ class App extends React.Component {
       "add-color-to-palette-requested",
       this._onAddColorToPaletteRequested.bind(this)
     );
+
+    document.addEventListener(
+      "view-palette-requested",
+      this._onViewPaletteRequested.bind(this)
+    );
+
+    document.addEventListener(
+      "close-palette-view",
+      this._removePaletteView.bind(this)
+    );
+
+    document.addEventListener(
+      "remove-color-from-palette-requested",
+      this._onRemoveColorFromPaletteRequested.bind(this)
+    );
   }
 
   render() {
@@ -144,7 +160,8 @@ class App extends React.Component {
     })
   }
 
-  _onNewPaletteRequested() {
+  _onNewPaletteRequested(event) {
+    event.stopImmediatePropagation();
     this._removeModal();
     const message = "Enter a name for your new palette:";
     this._modal = new Modal(message);
@@ -192,6 +209,7 @@ class App extends React.Component {
   }
 
   _onDeletePaletteRequested(event) {
+    event.stopImmediatePropagation();
     const { name } = event.detail;
     this._storeManager.deletePalette(name);
     this.setState({
@@ -202,6 +220,7 @@ class App extends React.Component {
   }
 
   _onRenamePaletteRequested(event) {
+    event.stopImmediatePropagation();
     const { oldName } = event.detail;
     this._removeModal();
     const message = `Enter a new name for your palette:`;
@@ -246,6 +265,7 @@ class App extends React.Component {
   }
 
   _onAddColorToPaletteRequested(event) {
+    event.stopImmediatePropagation();
     const { colorHEX } = event.detail;
     this._removeModal();
     const message = "Pick a palette!";
@@ -267,6 +287,29 @@ class App extends React.Component {
         this._removeModal();
         this._showMessage(message);
       }
+    }
+  }
+
+  _onViewPaletteRequested(event) {
+    event.stopImmediatePropagation();
+    const { name } = event.detail;
+    this._removePaletteView();
+    const palette = this.state.palettes.filter(p => p.name === name)[0];
+    if (palette) {
+      this._paletteView = new PaletteView(palette);
+      document.body.appendChild(this._paletteView);
+    }
+  }
+
+  _onRemoveColorFromPaletteRequested(event) {
+    event.stopImmediatePropagation();
+    const { color, palette } = event.detail;
+    const updatedPalette = this._storeManager.removeColorFromPalette(color, palette);
+    this.setState({
+      palettes: this._storeManager.palettes
+    });
+    if (this._paletteView) {
+      this._paletteView.update(updatedPalette);
     }
   }
 
@@ -322,6 +365,13 @@ class App extends React.Component {
     if (this._modal) {
       this._modal.remove();
       this._modal = null;
+    }
+  }
+
+  _removePaletteView() {
+    if (this._paletteView) {
+      this._paletteView.remove();
+      this._paletteView = null;
     }
   }
 }

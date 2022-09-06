@@ -51,6 +51,8 @@ class PreviewCard extends React.Component {
         id={this.props.id}
         key={this.props.id}
         style={this._initStyles}
+        onClick={this._onClick.bind(this)}
+        onContextMenu={this._onContextMenu.bind(this)}
       >
         {previewDivs}
         <div
@@ -77,13 +79,18 @@ class PreviewCard extends React.Component {
     );
   }
 
-  componentDidMount() {
-    const thisCard = this._rootEl();
-    thisCard.addEventListener("contextmenu", this._onContextMenu.bind(this));
-  }
-
   _rootEl() {
     return document.getElementById(this.props.id);
+  }
+
+  _onClick(event) {
+    const customEvent = new CustomEvent("view-palette-requested", {
+      bubbles: true,
+      detail: {
+        name: this.props.name
+      }
+    });
+    event.target.dispatchEvent(customEvent);
   }
 
   _onContextMenu(event) {

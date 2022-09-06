@@ -17,13 +17,16 @@ class ContextMenu extends HTMLElement {
       borderRadius: "3px"
     });
 
-    document.addEventListener("click", () => {
-      this.remove();
-    });
+    document.addEventListener("click", this._onClick.bind(this));
   }
 
   addOption(text, onClick) {
     this.appendChild(new Option(text, onClick));
+  }
+
+  _onClick() {
+    this.remove();
+    document.removeEventListener("click", this._onClick);
   }
 }
 
