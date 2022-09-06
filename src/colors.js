@@ -60,6 +60,11 @@ const colors = {
       color: SUCCESS_FG,
       borderColor: SUCCESS_FG
     }
+  },
+  paletteCard: {
+    backgroundColor: LIGHT,
+    color: DARK,
+    borderColor: DARK
   }
 };
 

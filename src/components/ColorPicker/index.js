@@ -8,7 +8,6 @@ import ColorPreview from "./ColorPreview";
 import ClipboardInput from "./ClipboardInput";
 import ColorControl from "./ColorControl";
 import Action from "./Action";
-import Modal from "../../custom-html-components/Modal";
 
 const RGB_MODE = "RGB";
 const HEX_MODE = "HEX";
@@ -150,38 +149,10 @@ class ColorPicker extends React.Component {
   }
 
   _onNewPaletteActionClick() {
-    const message = "Enter a name for your new palette:";
-    const onBlur = (event) => {
-      const value = event.target.value;
-      let valid = true;
-      if (value.length === 0) valid = false;
-      const palettes = this._storeManager.palettes;
-      const found = palettes.filter((p) => {
-        return p.name === value;
-      });
-      if (found.length > 0) valid = false;
-
-      if (valid) {
-        event.target.dispatchEvent(
-          new CustomEvent("unlock", { bubbles: true })
-        );
-      } else {
-        event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
-      }
-    };
-
-    const onConfirm = (value) => {
-      const newPalette = {
-        name: value,
-        colors: [],
-      };
-      this._storeManager.addPalette(newPalette);
-      const message = `Palette '${value}' created!`;
-      this._showMessage(message);
-    };
-
-    const modal = new Modal(message, onConfirm.bind(this), onBlur.bind(this));
-    document.body.appendChild(modal);
+    const customEvent = new CustomEvent('new-palette-requested', {
+      bubbles: true,
+    });
+    this._rootEl().dispatchEvent(customEvent);
   }
 
   _updateColorValue(colorName, newValue) {

@@ -5,10 +5,15 @@ import Header from "./components/Header";
 import Page from "./components/Page";
 import ColorPicker from "./components/ColorPicker";
 import universalStyles from "./universal-styles";
+import PalettesView from "./components/PalettesView";
+import StoreManager from "./StoreManager";
+import Modal from "./custom-html-components/Modal";
 
 class App extends React.Component {
   constructor() {
     super();
+
+    this._storeManager = new StoreManager();
 
     this._initStyles = {
       ...universalStyles,
@@ -27,45 +32,52 @@ class App extends React.Component {
     this._linkItems = [
       {
         active: true,
-        href: "#picker",
         text: "picker",
-        onClick: this._onPickerLinkClick,
+        onClick: this._onHeaderLinkClick.bind(this),
       },
       {
         active: false,
-        href: "#palettes",
         text: "palettes",
-        onClick: this._onPickerLinkClick,
+        onClick: this._onHeaderLinkClick.bind(this),
       },
       {
         active: false,
-        href: "#favorites",
         text: "favorites",
-        onClick: this._onPickerLinkClick,
+        onClick: this._onHeaderLinkClick.bind(this),
       },
     ];
 
     this._activeLinkStyles = {};
+
+    this.state = {
+      palettes: this._storeManager.palettes,
+      linkItems: this._linkItems
+    };
   }
 
   componentDidMount() {
-    const appHeading = document.querySelector('header h1');
+    const appHeading = document.querySelector("header h1");
     if (window.innerWidth < 580) {
-      appHeading.style.display = 'none';
+      appHeading.style.display = "none";
     }
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       if (window.innerWidth < 580) {
-        appHeading.style.display = 'none';
+        appHeading.style.display = "none";
       } else {
-        appHeading.style.display = 'block';
+        appHeading.style.display = "block";
       }
     });
+
+    document.addEventListener(
+      "new-palette-requested",
+      this._onNewPaletteRequested.bind(this)
+    );
   }
 
   render() {
     return (
-      <div style={this._initStyles}>
-        <Header linkItems={this._linkItems} />
+      <div id="app" style={this._initStyles}>
+        <Header linkItems={this.state.linkItems} />
         <main style={{ flexGrow: 1 }}>
           <Page
             rootId={"picker"}
@@ -87,10 +99,14 @@ class App extends React.Component {
     );
   }
 
-  _onPickerLinkClick(event) {
-    const anchor = event.target;
-    const pageId = anchor.href.split("/").pop();
-    const page = document.querySelector(pageId);
+  _rootEl() {
+    return document.getElementById("app");
+  }
+
+  _onHeaderLinkClick(event) {
+    const link = event.target;
+    const pageId = link.textContent;
+    const page = document.getElementById(pageId);
     if (page.style.display !== "none") return;
     const pages = document.querySelectorAll(".page");
     pages.forEach((p) => {
@@ -99,10 +115,57 @@ class App extends React.Component {
       }
     });
     applyStyles(page, { display: "flex" });
-    const activeAnchor = document.querySelector(".nav-link.active");
-    if (activeAnchor) activeAnchor.classList.remove("active");
-    applyStyles(activeAnchor, colors.navLink.inactive);
-    anchor.classList.add("active");
+    this._linkItems.forEach((li) => {
+      if (li.text === pageId) {
+        li.active = true;
+      } else {
+        li.active = false;
+      }
+    });
+    this.setState({
+      linkItems: this._linkItems
+    })
+  }
+
+  _onNewPaletteRequested() {
+    const message = "Enter a name for your new palette:";
+    let modal = document.querySelector('custom-modal');
+    if (modal) modal.remove();
+    modal = new Modal(message, onConfirm.bind(this), onBlur.bind(this));
+    document.body.appendChild(modal);
+
+    function onConfirm(value) {
+      modal.remove();
+      const newPalette = {
+        name: value,
+        colors: [],
+      };
+      this._storeManager.addPalette(newPalette);
+      this.setState({
+        palettes: this._storeManager.palettes,
+      });
+      const message = `Palette '${value}' created!`;
+      this._showMessage(message);
+    }
+
+    function onBlur(event) {
+      const value = event.target.value;
+      let valid = true;
+      if (value.length === 0) valid = false;
+      const palettes = this._storeManager.palettes;
+      const found = palettes.filter((p) => {
+        return p.name === value;
+      });
+      if (found.length > 0) valid = false;
+
+      if (valid) {
+        event.target.dispatchEvent(
+          new CustomEvent("unlock", { bubbles: true })
+        );
+      } else {
+        event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
+      }
+    }
   }
 
   _buildPickerPage() {
@@ -110,11 +173,47 @@ class App extends React.Component {
   }
 
   _buildPalettesPage() {
-    return <h1>palettes</h1>;
+    return <PalettesView palettes={this.state.palettes} />;
   }
 
   _buildFavoritesPage() {
     return <h1>favorites</h1>;
+  }
+
+  _showMessage(text, error) {
+    let flashDiv = document.querySelector(".flash");
+    if (flashDiv) flashDiv.remove();
+    flashDiv = document.createElement("div");
+    flashDiv.classList.add("flash");
+    flashDiv.textContent = text;
+    applyStyles(flashDiv, {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "0.5em",
+      width: "100%",
+      maxWidth: "500px",
+      margin: "1em auto",
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderRadius: "3px",
+    });
+    if (error) {
+      applyStyles(flashDiv, {
+        ...colors.flashMessage.error,
+      });
+    } else {
+      applyStyles(flashDiv, {
+        ...colors.flashMessage.success,
+      });
+    }
+
+    const main = document.querySelector("main");
+    this._rootEl().insertBefore(flashDiv, main);
+
+    setTimeout(() => {
+      flashDiv.remove();
+    }, 3000);
   }
 }
 

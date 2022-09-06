@@ -25,7 +25,6 @@ class Nav extends React.Component {
         <NavLink
           key={index}
           active={li.active}
-          href={li.href}
           text={li.text}
           onClick={li.onClick}
         />

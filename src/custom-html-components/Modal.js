@@ -122,9 +122,6 @@ class Modal extends HTMLElement {
       if (this._valid) {
         setTimeout(() => {
           onConfirm(this._input.value);
-          setTimeout(() => {
-            this.remove();
-          });
         });
       }
     });

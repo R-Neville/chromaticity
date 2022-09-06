@@ -11,7 +11,9 @@ class Page extends React.Component {
       alignItems: "center",
       padding: "1em",
       width: "100%",
+      maxWidth: "700px",
       height: "100%",
+      margin: "auto",
     };
   }
 
