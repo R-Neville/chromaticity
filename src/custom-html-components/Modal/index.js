@@ -3,6 +3,7 @@ import { applyStyles } from "../../helpers";
 import Input from "./Input";
 import Action from "./Action";
 import universalStyles from "../../universal-styles";
+import Selector from "./Selector";
 
 class Modal extends HTMLElement {
   constructor(text) {
@@ -11,6 +12,8 @@ class Modal extends HTMLElement {
     this._valid = false;
     this._text = text;
     this._input = null;
+    this._selector = null;
+    this._selection = null;
     this._actions = [];
 
     this._contentWrapper = document.createElement("div");
@@ -86,6 +89,12 @@ class Modal extends HTMLElement {
         color: colors.app.color,
       });
     });
+    this.addEventListener("selection-changed", (event) => {
+      event.stopPropagation();
+      const { newValue } = event.detail;
+      this._selection = newValue;
+      this._valid = true;
+    });
   }
 
   get valid() {
@@ -93,12 +102,24 @@ class Modal extends HTMLElement {
   }
 
   get inputValue() {
-    return this._input.value;
+    if (this._input) {
+      return this._input.value;
+    }
+    return null;
+  }
+
+  get selection() {
+    return this._selection;
   }
 
   addInput(onInput, initialValue) {
     this._input = new Input(onInput, initialValue);
     this._body.insertBefore(this._input, this._actions);
+  }
+
+  addSelector(options) {
+    this._selector = new Selector(options);
+    this._body.insertBefore(this._selector, this._actions);
   }
 
   addAction(text, onClick) {

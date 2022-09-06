@@ -98,7 +98,10 @@ class ColorPicker extends React.Component {
           text={"New Palette"}
           onClick={this._onNewPaletteActionClick.bind(this)}
         />
-        <Action text={"Add To Palette"} />
+        <Action
+          text={"Add To Palette"}
+          onClick={this._onAddToPaletteButtonClick.bind(this)}
+        />
         <Action text={"Add To Favorites"} />
       </div>
     );
@@ -149,8 +152,23 @@ class ColorPicker extends React.Component {
   }
 
   _onNewPaletteActionClick() {
-    const customEvent = new CustomEvent('new-palette-requested', {
+    const customEvent = new CustomEvent("new-palette-requested", {
       bubbles: true,
+    });
+    this._rootEl().dispatchEvent(customEvent);
+  }
+
+  _onAddToPaletteButtonClick() {
+    if (this._storeManager.palettes.length === 0) {
+      const message = "You need to create a palette first.";
+      this._showMessage(message, true);
+      return;
+    }
+    const customEvent = new CustomEvent("add-color-to-palette-requested", {
+      bubbles: true,
+      detail: {
+        colorHEX: this.state.previewColor,
+      },
     });
     this._rootEl().dispatchEvent(customEvent);
   }

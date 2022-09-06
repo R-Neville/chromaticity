@@ -97,6 +97,16 @@ export default class StoreManager {
     });
     this.palettes = palettes;
   }
+
+  addColorToPalette(color, paletteName) {
+    const palettes = this.palettes;
+    palettes.forEach(p => {
+      if (p.name === paletteName && !p.colors.includes(color)) {
+        p.colors.push(color);
+      }
+    });
+    this.palettes = palettes;
+  }
 }
 
 function hexStringFromInt(int) {

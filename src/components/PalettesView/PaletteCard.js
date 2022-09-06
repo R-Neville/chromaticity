@@ -29,20 +29,20 @@ class PreviewCard extends React.Component {
       if (colorsLength < MAX_PREVIEW_COLORS) {
         for (let i = 0; i < colorsLength; i++) {
           previewColors.push(
-            this.props.colors[Math.floor(Math.random() * colors.length)]
+            this.props.colors[i]
           );
         }
       } else {
         for (let i = 0; i < MAX_PREVIEW_COLORS; i++) {
           previewColors.push(
-            this.props.colors[Math.floor(Math.random() * colorsLength)]
+            this.props.colors[i]
           );
         }
       }
     }
 
-    const previewDivs = previewColors.map((color) => {
-      return <div style={{ backgroundColor: color }}></div>;
+    const previewDivs = previewColors.map((color, index) => {
+      return <div key={`preview-color-${index}`} style={{ width: "100%", backgroundColor: color }}></div>;
     });
 
     return (
@@ -55,13 +55,16 @@ class PreviewCard extends React.Component {
         {previewDivs}
         <div
           style={{
-            position: "absolue",
+            ...universalStyles,
+            position: "absolute",
+            top: "50%",
+            transform: "translateY(-50%)",
             overflow: "hidden",
-            padding: "0.5em 1em",
+            padding: "0.5em",
             width: "100%",
             borderTop: `1px solid ${colors.paletteCard.borderColor}`,
             borderBottom: `1px solid ${colors.paletteCard.borderColor}`,
-            margin: "auto 0",
+            backgroundColor: "#FFF",
             textAlign: "center",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",

@@ -20,6 +20,8 @@ class App extends React.Component {
 
     this._storeManager = new StoreManager();
 
+    this._modal = null;
+
     this._initStyles = {
       ...universalStyles,
       display: "flex",
@@ -87,6 +89,11 @@ class App extends React.Component {
       "rename-palette-requested",
       this._onRenamePaletteRequested.bind(this)
     );
+
+    document.addEventListener(
+      "add-color-to-palette-requested",
+      this._onAddColorToPaletteRequested.bind(this)
+    );
   }
 
   render() {
@@ -137,17 +144,16 @@ class App extends React.Component {
     })
   }
 
-  _onNewPaletteRequested(event) {
-    let modal = document.querySelector('custom-modal');
-    if (modal) modal.remove();
+  _onNewPaletteRequested() {
+    this._removeModal();
     const message = "Enter a name for your new palette:";
-    modal = new Modal(message);
-    modal.addInput(onInput.bind(this));
-    modal.addAction("Cancel", () => {
-      modal.remove();
+    this._modal = new Modal(message);
+    this._modal.addInput(onInput.bind(this));
+    this._modal.addAction("Cancel", () => {
+      this._removeModal();
     });
-    modal.addAction("Confirm", onConfirm.bind(this));
-    document.body.appendChild(modal);
+    this._modal.addAction("Confirm", onConfirm.bind(this));
+    document.body.appendChild(this._modal);
 
     function onInput(event) {
       const value = event.target.value;
@@ -169,17 +175,17 @@ class App extends React.Component {
     }
 
     function onConfirm() {
-      if (modal.valid) {
+      if (this._modal.valid) {
         const newPalette = {
-          name: modal.inputValue,
+          name: this._modal.inputValue,
           colors: [],
         };
         this._storeManager.addPalette(newPalette);
         this.setState({
           palettes: this._storeManager.palettes,
         });
-        modal.remove();
-        const message = `Palette '${modal.inputValue}' created!`;
+        const message = `Palette '${this._modal.inputValue}' created!`;
+        this._removeModal();
         this._showMessage(message);
       }
     }
@@ -197,16 +203,15 @@ class App extends React.Component {
 
   _onRenamePaletteRequested(event) {
     const { oldName } = event.detail;
-    let modal = document.querySelector('custom-modal');
-    if (modal) modal.remove();
+    this._removeModal();
     const message = `Enter a new name for your palette:`;
-    modal = new Modal(message);
-    modal.addInput(onInput.bind(this), oldName);
-    modal.addAction("Cancel", () => {
-      modal.remove();
+    this._modal = new Modal(message);
+    this._modal.addInput(onInput.bind(this), oldName);
+    this._modal.addAction("Cancel", () => {
+      this._removeModal();
     });
-    modal.addAction("Confirm", onConfirm.bind(this));
-    document.body.appendChild(modal);
+    this._modal.addAction("Confirm", onConfirm.bind(this));
+    document.body.appendChild(this._modal);
   
     function onInput(event) {
       const value = event.target.value;
@@ -228,13 +233,38 @@ class App extends React.Component {
     }
 
     function onConfirm() {
-      if (modal.valid) {
-        this._storeManager.renamePalette(oldName, modal.inputValue);
+      if (this._modal.valid) {
+        this._storeManager.renamePalette(oldName, this._modal.inputValue);
         this.setState({
           palettes: this._storeManager.palettes,
         });
-        modal.remove();
-        const message = `Palette '${oldName}' renamed to '${modal.inputValue}'!`;
+        const message = `Palette '${oldName}' renamed to '${this._modal.inputValue}'!`;
+        this._removeModal()
+        this._showMessage(message);
+      }
+    }
+  }
+
+  _onAddColorToPaletteRequested(event) {
+    const { colorHEX } = event.detail;
+    this._removeModal();
+    const message = "Pick a palette!";
+    this._modal = new Modal(message);
+    this._modal.addSelector(this.state.palettes.map(p => p.name));
+    this._modal.addAction("Cancel", () => {
+      this._removeModal();
+    });
+    this._modal.addAction("Confirm", onConfirm.bind(this));
+    document.body.appendChild(this._modal);
+
+    function onConfirm() {
+      if (this._modal.valid) {
+        this._storeManager.addColorToPalette(colorHEX, this._modal.selection);
+        this.setState({
+          palettes: this._storeManager.palettes
+        });
+        const message = `'${colorHEX}' added to '${this._modal.selection}!`;
+        this._removeModal();
         this._showMessage(message);
       }
     }
@@ -286,6 +316,13 @@ class App extends React.Component {
     setTimeout(() => {
       flashDiv.remove();
     }, 3000);
+  }
+
+  _removeModal() {
+    if (this._modal) {
+      this._modal.remove();
+      this._modal = null;
+    }
   }
 }
 
