@@ -87,6 +87,15 @@ class PreviewCard extends React.Component {
     event.preventDefault();
     const rootEl = this._rootEl();
     const menu = new ContextMenu(event.pageX, event.pageY);
+    menu.addOption("Rename", () => {
+      const customEvent = new CustomEvent("rename-palette-requested", {
+        bubbles: true,
+        detail: {
+          oldName: this.props.name
+        }
+      });
+      rootEl.dispatchEvent(customEvent);
+    });
     menu.addOption("Delete", () => {
       const customEvent = new CustomEvent("delete-palette-requested", {
         bubbles: true,

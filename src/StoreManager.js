@@ -87,6 +87,16 @@ export default class StoreManager {
       this.palettes = palettes;
     }
   }
+
+  renamePalette(oldName, newName) {
+    const palettes = this.palettes;
+    palettes.forEach(p => {
+      if (p.name === oldName) {
+        p.name = newName;
+      }
+    });
+    this.palettes = palettes;
+  }
 }
 
 function hexStringFromInt(int) {

@@ -2,8 +2,10 @@ import { applyStyles } from "../../helpers";
 import colors from "../../colors";
 
 class Input extends HTMLInputElement {
-  constructor(onInput) {
+  constructor(onInput, defaultValue) {
     super();
+
+    if (defaultValue) this.value = defaultValue;
 
     applyStyles(this, {
       padding: "0 5px",

@@ -81,7 +81,12 @@ class App extends React.Component {
     document.addEventListener(
       "delete-palette-requested",
       this._onDeletePaletteRequested.bind(this)
-    )
+    );
+
+    document.addEventListener(
+      "rename-palette-requested",
+      this._onRenamePaletteRequested.bind(this)
+    );
   }
 
   render() {
@@ -133,9 +138,9 @@ class App extends React.Component {
   }
 
   _onNewPaletteRequested(event) {
-    const message = "Enter a name for your new palette:";
     let modal = document.querySelector('custom-modal');
     if (modal) modal.remove();
+    const message = "Enter a name for your new palette:";
     modal = new Modal(message);
     modal.addInput(onInput.bind(this));
     modal.addAction("Cancel", () => {
@@ -143,22 +148,6 @@ class App extends React.Component {
     });
     modal.addAction("Confirm", onConfirm.bind(this));
     document.body.appendChild(modal);
-
-    function onConfirm() {
-      if (modal.valid) {
-        const newPalette = {
-          name: modal.inputValue,
-          colors: [],
-        };
-        this._storeManager.addPalette(newPalette);
-        this.setState({
-          palettes: this._storeManager.palettes,
-        });
-        modal.remove();
-        const message = `Palette '${modal.inputValue}' created!`;
-        this._showMessage(message);
-      }
-    }
 
     function onInput(event) {
       const value = event.target.value;
@@ -178,6 +167,22 @@ class App extends React.Component {
         event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
       }
     }
+
+    function onConfirm() {
+      if (modal.valid) {
+        const newPalette = {
+          name: modal.inputValue,
+          colors: [],
+        };
+        this._storeManager.addPalette(newPalette);
+        this.setState({
+          palettes: this._storeManager.palettes,
+        });
+        modal.remove();
+        const message = `Palette '${modal.inputValue}' created!`;
+        this._showMessage(message);
+      }
+    }
   }
 
   _onDeletePaletteRequested(event) {
@@ -188,6 +193,51 @@ class App extends React.Component {
     });
     const message = `Palette '${name}' deleted!`;
     this._showMessage(message);
+  }
+
+  _onRenamePaletteRequested(event) {
+    const { oldName } = event.detail;
+    let modal = document.querySelector('custom-modal');
+    if (modal) modal.remove();
+    const message = `Enter a new name for your palette:`;
+    modal = new Modal(message);
+    modal.addInput(onInput.bind(this), oldName);
+    modal.addAction("Cancel", () => {
+      modal.remove();
+    });
+    modal.addAction("Confirm", onConfirm.bind(this));
+    document.body.appendChild(modal);
+  
+    function onInput(event) {
+      const value = event.target.value;
+      let valid = true;
+      if (value.length === 0) valid = false;
+      const palettes = this._storeManager.palettes;
+      const found = palettes.filter((p) => {
+        return p.name === value;
+      });
+      if (found.length > 0) valid = false;
+
+      if (valid) {
+        event.target.dispatchEvent(
+          new CustomEvent("unlock", { bubbles: true })
+        );
+      } else {
+        event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
+      }
+    }
+
+    function onConfirm() {
+      if (modal.valid) {
+        this._storeManager.renamePalette(oldName, modal.inputValue);
+        this.setState({
+          palettes: this._storeManager.palettes,
+        });
+        modal.remove();
+        const message = `Palette '${oldName}' renamed to '${modal.inputValue}'!`;
+        this._showMessage(message);
+      }
+    }
   }
 
   _buildPickerPage() {
