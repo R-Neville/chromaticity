@@ -32,7 +32,6 @@ class Header extends React.Component {
             margin: 0,
           }}
         >
-          
           Chormaticity
         </h1>
         <Nav linkItems={this.props.linkItems} />
