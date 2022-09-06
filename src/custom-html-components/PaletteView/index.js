@@ -15,6 +15,8 @@ class PaletteView extends HTMLElement {
     this._closeButton.textContent = "Close";
     this._heading.textContent = this._palette.name;
 
+    this._noColors = document.createElement("p");
+    this._noColors.textContent = "This palette is empty.";
     this._body = document.createElement("div");
 
     this.appendChild(this._contentWrapper);
@@ -23,10 +25,15 @@ class PaletteView extends HTMLElement {
     this._contentWrapper.appendChild(this._header);
     this._contentWrapper.appendChild(this._body);
 
-    this._palette.colors.forEach((color) => {
-      this._body.appendChild(this._buildColorCard(color));
-    });
-
+    if (this._palette.colors.length > 0) {
+      this._noColors.remove();
+      this._palette.colors.forEach((color) => {
+        this._body.appendChild(this._buildColorCard(color));
+      });
+    } else {
+      this._body.appendChild(this._noColors);
+    }
+    
     applyStyles(this, {
       ...universalStyles,
       display: "flex",
@@ -53,6 +60,7 @@ class PaletteView extends HTMLElement {
       maxWidth: "500px",
       height: "100%",
       maxHeight: "500px",
+      borderRadius: "3px",
       backgroundColor: colors.app.backgroundColor,
       color: colors.app.color,
     });
@@ -156,9 +164,14 @@ class PaletteView extends HTMLElement {
     Array.from(this._body.children).forEach(colorCard => {
       colorCard.remove();
     });
-    this._palette.colors.forEach(color => {
-      this._body.appendChild(this._buildColorCard(color));
-    });
+    if (this._palette.colors.length > 0) {
+      this._noColors.remove();
+      this._palette.colors.forEach((color) => {
+        this._body.appendChild(this._buildColorCard(color));
+      });
+    } else {
+      this._body.appendChild(this._noColors);
+    }
   }
 }
 
