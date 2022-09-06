@@ -185,6 +185,8 @@ class App extends React.Component {
     this.setState({
       palettes: this._storeManager.palettes
     });
+    const message = `Palette '${name}' deleted!`;
+    this._showMessage(message);
   }
 
   _buildPickerPage() {
