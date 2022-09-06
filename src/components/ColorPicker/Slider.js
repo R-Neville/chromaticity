@@ -100,12 +100,10 @@ class Slider extends React.Component {
       startX += closestStep;
     };
     const onMouseUp = () => {
-      document.body.style.userSelect = "all";
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
     };
 
-    document.body.style.userSelect = "none";
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
   }
@@ -131,12 +129,10 @@ class Slider extends React.Component {
       startX += closestStep;
     };
     const onTouchEnd = () => {
-      document.body.style.userSelect = "all";
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
     };
 
-    document.body.style.userSelect = "none";
     document.addEventListener("touchmove", onTouchMove);
     document.addEventListener("touchend", onTouchEnd);
   }

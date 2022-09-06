@@ -12,6 +12,7 @@ applyStyles(document.body, {
   width: "100vw",
   minHeight: "100vh",
   margin: 0,
+  userSelect: "none",
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
