@@ -283,7 +283,7 @@ class App extends React.Component {
         this.setState({
           palettes: this._storeManager.palettes
         });
-        const message = `'${colorHEX}' added to '${this._modal.selection}!`;
+        const message = `'${colorHEX}' added to '${this._modal.selection}'!`;
         this._removeModal();
         this._showMessage(message);
       }
