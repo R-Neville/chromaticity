@@ -8,6 +8,11 @@ import universalStyles from "./universal-styles";
 import PalettesView from "./components/PalettesView";
 import StoreManager from "./StoreManager";
 import Modal from "./custom-html-components/Modal";
+import Footer from "./components/Footer";
+
+const PICKER = "picker";
+const PALETTES = "palettes";
+const FAVORITES = "favorites";
 
 class App extends React.Component {
   constructor() {
@@ -31,17 +36,17 @@ class App extends React.Component {
     this._linkItems = [
       {
         active: true,
-        text: "picker",
+        text: PICKER,
         onClick: this._onHeaderLinkClick.bind(this),
       },
       {
         active: false,
-        text: "palettes",
+        text: PALETTES,
         onClick: this._onHeaderLinkClick.bind(this),
       },
       {
         active: false,
-        text: "favorites",
+        text: FAVORITES,
         onClick: this._onHeaderLinkClick.bind(this),
       },
     ];
@@ -50,7 +55,8 @@ class App extends React.Component {
 
     this.state = {
       palettes: this._storeManager.palettes,
-      linkItems: this._linkItems
+      linkItems: this._linkItems,
+      page: PICKER
     };
   }
 
@@ -63,7 +69,7 @@ class App extends React.Component {
       if (window.innerWidth < 580) {
         appHeading.style.display = "none";
       } else {
-        appHeading.style.display = "block";
+        appHeading.style.display = "flex";
       }
     });
 
@@ -82,23 +88,24 @@ class App extends React.Component {
     return (
       <div id="app" style={this._initStyles}>
         <Header linkItems={this.state.linkItems} />
-        <main style={{ flexGrow: 1 }}>
+        <main style={{ ...universalStyles, flexGrow: 1 }}>
           <Page
-            rootId={"picker"}
-            display={"flex"}
+            rootId={PICKER}
+            display={this.state.page === PICKER ? "flex" : "none"}
             children={this._buildPickerPage()}
           />
           <Page
-            rootId={"palettes"}
-            display={"none"}
+            rootId={PALETTES}
+            display={this.state.page === PALETTES ? "flex" : "none"}
             children={this._buildPalettesPage()}
           />
           <Page
-            rootId={"favorites"}
-            display={"none"}
+            rootId={FAVORITES}
+            display={this.state.page === FAVORITES ? "flex" : "none"}
             children={this._buildFavoritesPage()}
           />
         </main>
+        <Footer />
       </div>
     );
   }
@@ -110,15 +117,9 @@ class App extends React.Component {
   _onHeaderLinkClick(event) {
     const link = event.target;
     const pageId = link.textContent;
-    const page = document.getElementById(pageId);
-    if (page.style.display !== "none") return;
-    const pages = document.querySelectorAll(".page");
-    pages.forEach((p) => {
-      if (p.id !== pageId) {
-        applyStyles(p, { display: "none" });
-      }
-    });
-    applyStyles(page, { display: "flex" });
+    this.setState({
+      page: pageId
+    })
     this._linkItems.forEach((li) => {
       if (li.text === pageId) {
         li.active = true;

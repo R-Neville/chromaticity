@@ -10,7 +10,7 @@ class Header extends React.Component {
     this._initStyles = {
       ...universalStyles,
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "space-evenly",
       alignItems: "center",
       padding: "1em",
       boxSizing: "border-box",
@@ -24,7 +24,17 @@ class Header extends React.Component {
   render() {
     return (
       <header style={this._initStyles}>
-        <h1 style={{ margin: 0, marginRight: "auto" }}>Chormaticity</h1>
+        <h1
+          style={{
+            ...universalStyles,
+            display: "flex",
+            alignItems: "center",
+            margin: 0,
+          }}
+        >
+          
+          Chormaticity
+        </h1>
         <Nav linkItems={this.props.linkItems} />
       </header>
     );
