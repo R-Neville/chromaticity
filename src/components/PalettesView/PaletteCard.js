@@ -1,6 +1,7 @@
 import React from "react";
 import universalStyles from "../../universal-styles";
 import colors from "../../colors";
+import ContextMenu from "../../custom-html-components/ContextMenu";
 
 const MAX_PREVIEW_COLORS = 4;
 
@@ -47,7 +48,8 @@ class PreviewCard extends React.Component {
     return (
       <div
         className="palette-card"
-        key={this.props.name}
+        id={this.props.id}
+        key={this.props.id}
         style={this._initStyles}
       >
         {previewDivs}
@@ -70,6 +72,31 @@ class PreviewCard extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    const thisCard = this._rootEl();
+    thisCard.addEventListener("contextmenu", this._onContextMenu.bind(this));
+  }
+
+  _rootEl() {
+    return document.getElementById(this.props.id);
+  }
+
+  _onContextMenu(event) {
+    event.preventDefault();
+    const rootEl = this._rootEl();
+    const menu = new ContextMenu(event.pageX, event.pageY);
+    menu.addOption("Delete", () => {
+      const customEvent = new CustomEvent("delete-palette-requested", {
+        bubbles: true,
+        detail: {
+          name: this.props.name
+        },
+      });
+      rootEl.dispatchEvent(customEvent);
+    });
+    document.body.appendChild(menu);
   }
 }
 

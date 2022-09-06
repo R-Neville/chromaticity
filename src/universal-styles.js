@@ -1,5 +1,6 @@
 const universalStyles = {
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  fontFamily: "Arial",
 };
 
 export default universalStyles;

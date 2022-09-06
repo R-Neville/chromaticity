@@ -25,7 +25,6 @@ class App extends React.Component {
       minHeight: "100vh",
       margin: 0,
       fontSize: "1em",
-      fontFamily: "Arial",
       ...colors.app,
     };
 
@@ -72,6 +71,11 @@ class App extends React.Component {
       "new-palette-requested",
       this._onNewPaletteRequested.bind(this)
     );
+
+    document.addEventListener(
+      "delete-palette-requested",
+      this._onDeletePaletteRequested.bind(this)
+    )
   }
 
   render() {
@@ -127,28 +131,35 @@ class App extends React.Component {
     })
   }
 
-  _onNewPaletteRequested() {
+  _onNewPaletteRequested(event) {
     const message = "Enter a name for your new palette:";
     let modal = document.querySelector('custom-modal');
     if (modal) modal.remove();
-    modal = new Modal(message, onConfirm.bind(this), onBlur.bind(this));
+    modal = new Modal(message);
+    modal.addInput(onInput.bind(this));
+    modal.addAction("Cancel", () => {
+      modal.remove();
+    });
+    modal.addAction("Confirm", onConfirm.bind(this));
     document.body.appendChild(modal);
 
-    function onConfirm(value) {
-      modal.remove();
-      const newPalette = {
-        name: value,
-        colors: [],
-      };
-      this._storeManager.addPalette(newPalette);
-      this.setState({
-        palettes: this._storeManager.palettes,
-      });
-      const message = `Palette '${value}' created!`;
-      this._showMessage(message);
+    function onConfirm() {
+      if (modal.valid) {
+        const newPalette = {
+          name: modal.inputValue,
+          colors: [],
+        };
+        this._storeManager.addPalette(newPalette);
+        this.setState({
+          palettes: this._storeManager.palettes,
+        });
+        modal.remove();
+        const message = `Palette '${modal.inputValue}' created!`;
+        this._showMessage(message);
+      }
     }
 
-    function onBlur(event) {
+    function onInput(event) {
       const value = event.target.value;
       let valid = true;
       if (value.length === 0) valid = false;
@@ -166,6 +177,14 @@ class App extends React.Component {
         event.target.dispatchEvent(new CustomEvent("lock", { bubbles: true }));
       }
     }
+  }
+
+  _onDeletePaletteRequested(event) {
+    const { name } = event.detail;
+    this._storeManager.deletePalette(name);
+    this.setState({
+      palettes: this._storeManager.palettes
+    });
   }
 
   _buildPickerPage() {

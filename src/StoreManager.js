@@ -78,6 +78,15 @@ export default class StoreManager {
     palettes.push(newPalette);
     this.palettes = palettes;
   }
+
+  deletePalette(name) {
+    const palettes = this.palettes;
+    const found = palettes.filter(p => p.name === name);
+    if (found.length > 0) {
+      palettes.splice(palettes.indexOf(found[0]), 1);
+      this.palettes = palettes;
+    }
+  }
 }
 
 function hexStringFromInt(int) {

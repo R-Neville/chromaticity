@@ -1,35 +1,34 @@
-import colors from "../colors";
-import { applyStyles } from "../helpers";
+import colors from "../../colors";
+import { applyStyles } from "../../helpers";
+import Input from "./Input";
+import Action from "./Action";
+import universalStyles from "../../universal-styles";
 
 class Modal extends HTMLElement {
-  constructor(text, onConfirm, onBlur) {
+  constructor(text) {
     super();
 
     this._valid = false;
     this._text = text;
+    this._input = null;
+    this._actions = [];
 
     this._contentWrapper = document.createElement("div");
     this._header = document.createElement("div");
     this._header.textContent = text;
     this._body = document.createElement("div");
-    if (onBlur) this._input = document.createElement("input");
     this._actions = document.createElement("div");
-    this._confirmAction = document.createElement("button");
-    this._confirmAction.textContent = "Confirm";
-    this._cancelAction = document.createElement("button");
-    this._cancelAction.textContent = "Cancel";
 
     this.appendChild(this._contentWrapper);
     this._contentWrapper.appendChild(this._header);
     this._contentWrapper.appendChild(this._body);
-    if (this._input) this._body.appendChild(this._input);
     this._body.appendChild(this._actions);
-    this._actions.appendChild(this._cancelAction);
-    this._actions.appendChild(this._confirmAction);
 
     applyStyles(this, {
+      ...universalStyles,
       display: "flex",
       flexDirection: "column",
+      justifyContent: "center",
       alignItems: "center",
       position: "fixed",
       top: 0,
@@ -41,11 +40,15 @@ class Modal extends HTMLElement {
     });
 
     applyStyles(this._contentWrapper, {
+      ...universalStyles,
       display: "flex",
       flexDirection: "column",
+      width: "100%",
+      maxWidth: "500px",
     });
 
     applyStyles(this._header, {
+      ...universalStyles,
       padding: "1em",
       backgroundColor: colors.app.color,
       fontSize: "1em",
@@ -53,51 +56,18 @@ class Modal extends HTMLElement {
     });
 
     applyStyles(this._body, {
+      ...universalStyles,
       display: "flex",
       flexDirection: "column",
+      padding: "1em",
       backgroundColor: colors.app.backgroundColor,
     });
 
-    if (this._input) {
-      applyStyles(this._input, {
-        padding: "0 5px",
-        height: '30px',
-        border: `1px solid ${colors.app.color}`,
-        borderRadius: "3px",
-        outline: "none",
-        margin: "1em",
-        fontSize: "1em",
-        color: colors.app.color,
-      });
-    }
 
     applyStyles(this._actions, {
+      ...universalStyles,
       display: "flex",
-      justifyContent: "space-between",
-    });
-
-    applyStyles(this._confirmAction, {
-      padding: "0.5em 1em",
-      border: "none",
-      borderRadius: "3px",
-      outline: "none",
-      margin: "1em",
-      backgroundColor: colors.app.color,
-      fontSize: "1em",
-      color: colors.app.backgroundColor,
-      cursor: "pointer",
-    });
-
-    applyStyles(this._cancelAction, {
-      padding: "0.5em 1em",
-      border: "none",
-      borderRadius: "3px",
-      outline: "none",
-      margin: "1em",
-      backgroundColor: colors.app.color,
-      fontSize: "1em",
-      color: colors.app.backgroundColor,
-      cursor: "pointer",
+      justifyContent: "flex-end",
     });
 
     this.addEventListener("lock", (event) => {
@@ -116,15 +86,24 @@ class Modal extends HTMLElement {
         color: colors.app.color,
       });
     });
-    if (this._input) this._input.addEventListener("blur", onBlur);
-    this._cancelAction.addEventListener("click", () => this.remove());
-    this._confirmAction.addEventListener("click", () => {
-      if (this._valid) {
-        setTimeout(() => {
-          onConfirm(this._input.value);
-        });
-      }
-    });
+  }
+
+  get valid() {
+    return this._valid;
+  }
+
+  get inputValue() {
+    return this._input.value;
+  }
+
+  addInput(onInput, initialValue) {
+    this._input = new Input(onInput, initialValue);
+    this._body.insertBefore(this._input, this._actions);
+  }
+
+  addAction(text, onClick) {
+    const action = new Action(text, onClick);
+    this._actions.appendChild(action);
   }
 }
 
