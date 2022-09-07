@@ -8,3 +8,5 @@ of colors for use in Web design and graphic art. It has a simple intuitive inter
 color picker. If you stumble across one that you like, you can add it to your favourites or even create a palette and save it for later!
 Palettes are useful for grouping together related colors. You can easily rename or delete a palette, or remove colors from a palette/favorites
 using context menus!
+
+This app is currently deployed at [https://r-neville.github.io/chromaticity/](https://r-neville.github.io/chromaticity/). Check it out!
