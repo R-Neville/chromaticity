@@ -3,8 +3,6 @@ import universalStyles from "../../universal-styles";
 import colors from "../../colors";
 import ContextMenu from "../../custom-html-components/ContextMenu";
 
-const MAX_PREVIEW_COLORS = 4;
-
 class PreviewCard extends React.Component {
   constructor(props) {
     super(props);
@@ -24,21 +22,10 @@ class PreviewCard extends React.Component {
 
   render() {
     let previewColors = [];
-    if (this.props.colors.length > 0) {
-      const colorsLength = this.props.colors.length;
-      if (colorsLength < MAX_PREVIEW_COLORS) {
-        for (let i = 0; i < colorsLength; i++) {
-          previewColors.push(
-            this.props.colors[i]
-          );
-        }
-      } else {
-        for (let i = 0; i < MAX_PREVIEW_COLORS; i++) {
-          previewColors.push(
-            this.props.colors[i]
-          );
-        }
-      }
+    for (let i = 0; i < this.props.colors.length; i++) {
+      previewColors.push(
+        this.props.colors[i]
+      );
     }
 
     const previewDivs = previewColors.map((color, index) => {
