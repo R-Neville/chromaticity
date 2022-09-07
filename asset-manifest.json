@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/chromaticity/static/js/main.5f396d92.js",
+    "main.js": "/chromaticity/static/js/main.4a761f5b.js",
     "index.html": "/chromaticity/index.html",
-    "main.5f396d92.js.map": "/chromaticity/static/js/main.5f396d92.js.map"
+    "main.4a761f5b.js.map": "/chromaticity/static/js/main.4a761f5b.js.map"
   },
   "entrypoints": [
-    "static/js/main.5f396d92.js"
+    "static/js/main.4a761f5b.js"
   ]
 }
