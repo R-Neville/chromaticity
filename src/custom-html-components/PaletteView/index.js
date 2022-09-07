@@ -140,6 +140,13 @@ class PaletteView extends HTMLElement {
       event.preventDefault();
       const { pageX, pageY } = event;
       const menu = new ContextMenu(pageX, pageY);
+      menu.addOption("Copy", () => {
+        window.navigator.clipboard.writeText(color);
+        const customEvent = new CustomEvent("color-copied-to-clipboard", {
+          bubbles: true,
+        });
+        colorCard.dispatchEvent(customEvent);
+      });
       menu.addOption("Remove", () => {
         const customEvent = new CustomEvent(
           "remove-color-from-palette-requested",
@@ -151,7 +158,7 @@ class PaletteView extends HTMLElement {
             }
           }
         );
-        this.dispatchEvent(customEvent);
+        colorCard.dispatchEvent(customEvent);
       });
       document.body.appendChild(menu);
     });
