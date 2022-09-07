@@ -32,7 +32,7 @@ class Header extends React.Component {
             margin: 0,
           }}
         >
-          Chormaticity
+          Chromaticity
         </h1>
         <Nav linkItems={this.props.linkItems} />
       </header>
