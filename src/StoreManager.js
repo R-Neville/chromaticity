@@ -3,6 +3,7 @@ const RED_KEY = "red";
 const GREEN_KEY = "green";
 const BLUE_KEY = "blue";
 const PALETTES_KEY = "palettes";
+const FAVORITES_KEY = "favorites";
 
 export default class StoreManager {
   constructor() {
@@ -11,6 +12,7 @@ export default class StoreManager {
     if (!this.green) this.green = 0;
     if (!this.blue) this.blue = 0;
     if (!this.palettes) this.palettes = [];
+    if (!this.favorites) this.favorites = [];
   }
 
   get mode() {
@@ -73,6 +75,14 @@ export default class StoreManager {
     window.localStorage.setItem(PALETTES_KEY, JSON.stringify(newValue));
   }
 
+  get favorites() {
+    return JSON.parse(window.localStorage.getItem(FAVORITES_KEY));
+  }
+
+  set favorites(newValue) {
+    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(newValue));
+  }
+
   addPalette(newPalette) {
     const palettes = this.palettes;
     palettes.push(newPalette);
@@ -115,6 +125,22 @@ export default class StoreManager {
     palettes.splice(palettes.indexOf(palette), 1, palette);
     this.palettes = palettes;
     return palette;
+  }
+
+  addColorToFavorites(color) {
+    const favorites = this.favorites;
+    if (!favorites.includes(color)) {
+      favorites.unshift(color);
+      this.favorites = favorites;
+    }
+  }
+
+  removeColorFromFavorites(color) {
+    const favorites = this.favorites;
+    if (favorites.includes(color)) {
+      favorites.splice(favorites.indexOf(color), 1);
+      this.favorites = favorites;
+    }
   }
 }
 

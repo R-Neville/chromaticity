@@ -44,7 +44,7 @@ class PalettesView extends React.Component {
       >
         <p style={{ fontSize: "1em", textAlign: "center" }}>
           You have {paletteCards.length} palette
-          {paletteCards.length > 1 ? "s" : ""}.
+          {paletteCards.length !== 1  && "s"}.
         </p>
         <button
           style={{

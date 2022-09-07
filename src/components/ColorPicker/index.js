@@ -1,5 +1,4 @@
 import React from "react";
-import { applyStyles } from "../../helpers";
 import colors from "../../colors";
 import StoreManager from "../../StoreManager";
 import TabBar from "../TabBar";
@@ -102,7 +101,10 @@ class ColorPicker extends React.Component {
           text={"Add To Palette"}
           onClick={this._onAddToPaletteButtonClick.bind(this)}
         />
-        <Action text={"Add To Favorites"} />
+        <Action
+          text={"Add To Favorites"}
+          onClick={this._onAddToFavoritesButtonClick.bind(this)}
+        />
       </div>
     );
   }
@@ -117,7 +119,6 @@ class ColorPicker extends React.Component {
       "color-input-changed",
       this._onColorInputChanged.bind(this)
     );
-    picker.addEventListener("color-copied", this._onColorCopied.bind(this));
   }
 
   _rootEl() {
@@ -149,11 +150,6 @@ class ColorPicker extends React.Component {
     window.location.reload(false); // Hacky fix...
   }
 
-  _onColorCopied(event) {
-    event.stopImmediatePropagation();
-    this._showMessage("Color copied to clipboard!");
-  }
-
   _onNewPaletteActionClick() {
     const customEvent = new CustomEvent("new-palette-requested", {
       bubbles: true,
@@ -162,12 +158,17 @@ class ColorPicker extends React.Component {
   }
 
   _onAddToPaletteButtonClick() {
-    if (this._storeManager.palettes.length === 0) {
-      const message = "You need to create a palette first.";
-      this._showMessage(message, true);
-      return;
-    }
     const customEvent = new CustomEvent("add-color-to-palette-requested", {
+      bubbles: true,
+      detail: {
+        colorHEX: this.state.previewColor,
+      },
+    });
+    this._rootEl().dispatchEvent(customEvent);
+  }
+
+  _onAddToFavoritesButtonClick() {
+    const customEvent = new CustomEvent("add-color-to-favorites-requested", {
       bubbles: true,
       detail: {
         colorHEX: this.state.previewColor,
@@ -218,41 +219,6 @@ class ColorPicker extends React.Component {
       mode: RGB_MODE,
       colorString: this._storeManager.fullRGB,
     });
-  }
-
-  _showMessage(text, error) {
-    const picker = this._rootEl();
-    let flashDiv = picker.querySelector(".flash");
-    if (flashDiv) flashDiv.remove();
-    flashDiv = document.createElement("div");
-    flashDiv.classList.add("flash");
-    flashDiv.textContent = text;
-    applyStyles(flashDiv, {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "0.5em",
-      margin: "0.5em 1em",
-      borderWidth: "1px",
-      borderStyle: "solid",
-      borderRadius: "3px",
-    });
-    if (error) {
-      applyStyles(flashDiv, {
-        ...colors.flashMessage.error,
-      });
-    } else {
-      applyStyles(flashDiv, {
-        ...colors.flashMessage.success,
-      });
-    }
-
-    const firstAction = picker.querySelector(".action");
-    picker.insertBefore(flashDiv, firstAction);
-
-    setTimeout(() => {
-      flashDiv.remove();
-    }, 3000);
   }
 }
 

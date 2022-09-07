@@ -10,6 +10,7 @@ import StoreManager from "./StoreManager";
 import Modal from "./custom-html-components/Modal";
 import Footer from "./components/Footer";
 import PaletteView from "./custom-html-components/PaletteView";
+import FavoritesView from "./components/FavoritesView";
 
 const PICKER = "picker";
 const PALETTES = "palettes";
@@ -58,8 +59,9 @@ class App extends React.Component {
 
     this.state = {
       palettes: this._storeManager.palettes,
+      favorites: this._storeManager.favorites,
       linkItems: this._linkItems,
-      page: PICKER
+      page: PICKER,
     };
   }
 
@@ -76,39 +78,56 @@ class App extends React.Component {
       }
     });
 
-    document.addEventListener(
+    const app = this._rootEl();
+
+    app.addEventListener(
       "new-palette-requested",
       this._onNewPaletteRequested.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "delete-palette-requested",
       this._onDeletePaletteRequested.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "rename-palette-requested",
       this._onRenamePaletteRequested.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "add-color-to-palette-requested",
       this._onAddColorToPaletteRequested.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "view-palette-requested",
       this._onViewPaletteRequested.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "close-palette-view",
       this._removePaletteView.bind(this)
     );
 
-    document.addEventListener(
+    app.addEventListener(
       "remove-color-from-palette-requested",
       this._onRemoveColorFromPaletteRequested.bind(this)
+    );
+
+    app.addEventListener(
+      "add-color-to-favorites-requested",
+      this._onAddColorToFavoritesRequested.bind(this)
+    );
+
+    app.addEventListener(
+      "remove-color-from-favorites-requested",
+      this._onRemoveColorFromFavoritesRequested.bind(this)
+    );
+
+    app.addEventListener(
+      "color-copied-to-clipboard",
+      this._onColorCopiedToClipboard.bind(this)
     );
   }
 
@@ -138,6 +157,18 @@ class App extends React.Component {
     );
   }
 
+  _buildPickerPage() {
+    return <ColorPicker />;
+  }
+
+  _buildPalettesPage() {
+    return <PalettesView palettes={this.state.palettes} />;
+  }
+
+  _buildFavoritesPage() {
+    return <FavoritesView favorites={this.state.favorites} />;
+  }
+
   _rootEl() {
     return document.getElementById("app");
   }
@@ -146,8 +177,8 @@ class App extends React.Component {
     const link = event.target;
     const pageId = link.textContent;
     this.setState({
-      page: pageId
-    })
+      page: pageId,
+    });
     this._linkItems.forEach((li) => {
       if (li.text === pageId) {
         li.active = true;
@@ -156,8 +187,8 @@ class App extends React.Component {
       }
     });
     this.setState({
-      linkItems: this._linkItems
-    })
+      linkItems: this._linkItems,
+    });
   }
 
   _onNewPaletteRequested(event) {
@@ -170,7 +201,7 @@ class App extends React.Component {
       this._removeModal();
     });
     this._modal.addAction("Confirm", onConfirm.bind(this));
-    document.body.appendChild(this._modal);
+    this._rootEl().appendChild(this._modal);
 
     function onInput(event) {
       const value = event.target.value;
@@ -213,7 +244,7 @@ class App extends React.Component {
     const { name } = event.detail;
     this._storeManager.deletePalette(name);
     this.setState({
-      palettes: this._storeManager.palettes
+      palettes: this._storeManager.palettes,
     });
     const message = `Palette '${name}' deleted!`;
     this._showMessage(message);
@@ -230,8 +261,8 @@ class App extends React.Component {
       this._removeModal();
     });
     this._modal.addAction("Confirm", onConfirm.bind(this));
-    document.body.appendChild(this._modal);
-  
+    this._rootEl().appendChild(this._modal);
+
     function onInput(event) {
       const value = event.target.value;
       let valid = true;
@@ -258,7 +289,7 @@ class App extends React.Component {
           palettes: this._storeManager.palettes,
         });
         const message = `Palette '${oldName}' renamed to '${this._modal.inputValue}'!`;
-        this._removeModal()
+        this._removeModal();
         this._showMessage(message);
       }
     }
@@ -266,22 +297,27 @@ class App extends React.Component {
 
   _onAddColorToPaletteRequested(event) {
     event.stopImmediatePropagation();
+    if (this._storeManager.palettes.length === 0) {
+      const message = "You need to create a palette first.";
+      this._showMessage(message, true);
+      return;
+    }
     const { colorHEX } = event.detail;
     this._removeModal();
     const message = "Pick a palette!";
     this._modal = new Modal(message);
-    this._modal.addSelector(this.state.palettes.map(p => p.name));
+    this._modal.addSelector(this.state.palettes.map((p) => p.name));
     this._modal.addAction("Cancel", () => {
       this._removeModal();
     });
     this._modal.addAction("Confirm", onConfirm.bind(this));
-    document.body.appendChild(this._modal);
+    this._rootEl().appendChild(this._modal);
 
     function onConfirm() {
       if (this._modal.valid) {
         this._storeManager.addColorToPalette(colorHEX, this._modal.selection);
         this.setState({
-          palettes: this._storeManager.palettes
+          palettes: this._storeManager.palettes,
         });
         const message = `'${colorHEX}' added to '${this._modal.selection}'!`;
         this._removeModal();
@@ -294,35 +330,53 @@ class App extends React.Component {
     event.stopImmediatePropagation();
     const { name } = event.detail;
     this._removePaletteView();
-    const palette = this.state.palettes.filter(p => p.name === name)[0];
+    const palette = this.state.palettes.filter((p) => p.name === name)[0];
     if (palette) {
       this._paletteView = new PaletteView(palette);
-      document.body.appendChild(this._paletteView);
+      this._rootEl().appendChild(this._paletteView);
     }
   }
 
   _onRemoveColorFromPaletteRequested(event) {
     event.stopImmediatePropagation();
     const { color, palette } = event.detail;
-    const updatedPalette = this._storeManager.removeColorFromPalette(color, palette);
+    const updatedPalette = this._storeManager.removeColorFromPalette(
+      color,
+      palette
+    );
     this.setState({
-      palettes: this._storeManager.palettes
+      palettes: this._storeManager.palettes,
     });
     if (this._paletteView) {
       this._paletteView.update(updatedPalette);
     }
   }
 
-  _buildPickerPage() {
-    return <ColorPicker />;
+  _onAddColorToFavoritesRequested(event) {
+    const { colorHEX } = event.detail;
+    this._storeManager.addColorToFavorites(colorHEX);
+    this.setState({
+      favorites: this._storeManager.favorites,
+    });
+    const message = `'${colorHEX}' added to favorites!`;
+    this._showMessage(message);
   }
 
-  _buildPalettesPage() {
-    return <PalettesView palettes={this.state.palettes} />;
+  _onRemoveColorFromFavoritesRequested(event) {
+    event.stopImmediatePropagation();
+    const { color } = event.detail;
+    this._storeManager.removeColorFromFavorites(color);
+    this.setState({
+      favorites: this._storeManager.favorites,
+    });
+    const message = `'${color}' removed from favorites.`;
+    this._showMessage(message);
   }
 
-  _buildFavoritesPage() {
-    return <h1>favorites</h1>;
+  _onColorCopiedToClipboard(event) {
+    event.stopImmediatePropagation();
+    const message = "Color copied to clipboard!";
+    this._showMessage(message);
   }
 
   _showMessage(text, error) {
