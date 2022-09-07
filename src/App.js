@@ -386,6 +386,7 @@ class App extends React.Component {
     flashDiv.classList.add("flash");
     flashDiv.textContent = text;
     applyStyles(flashDiv, {
+      ...universalStyles,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
