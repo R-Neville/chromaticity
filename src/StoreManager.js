@@ -1,4 +1,6 @@
 const MODE_KEY = "mode";
+const RGB_KEY = "RGB";
+const HEX_KEY = "HEX";
 const RED_KEY = "red";
 const GREEN_KEY = "green";
 const BLUE_KEY = "blue";
@@ -7,12 +9,24 @@ const FAVORITES_KEY = "favorites";
 
 export default class StoreManager {
   constructor() {
-    if (!this.mode) this.mode = "RGB";
-    if (!this.red) this.red = 0;
-    if (!this.green) this.green = 0;
-    if (!this.blue) this.blue = 0;
-    if (!this.palettes) this.palettes = [];
-    if (!this.favorites) this.favorites = [];
+    if (!this.mode) this.mode = RGB_KEY;
+    if (![ RGB_KEY, HEX_KEY ].some(key => key === this.mode)) {
+      this.mode = RGB_KEY;
+    }
+
+    this._validateColorValues();
+
+    try {
+      if (!this.palettes) this.palettes = [];
+    } catch {
+      this.palettes = [];
+    }
+
+    try {
+      if (!this.favorites) this.favorites = [];
+    } catch {
+      this.favorites = [];
+    }
   }
 
   get mode() {
@@ -68,19 +82,45 @@ export default class StoreManager {
   }
 
   get palettes() {
-    return JSON.parse(window.localStorage.getItem(PALETTES_KEY));
+    try {
+      return JSON.parse(window.localStorage.getItem(PALETTES_KEY));
+    } catch {
+      this.palettes = [];
+      return this.palettes;
+    }
   }
 
   set palettes(newValue) {
-    window.localStorage.setItem(PALETTES_KEY, JSON.stringify(newValue));
+    try {
+      window.localStorage.setItem(PALETTES_KEY, JSON.stringify(newValue));
+    } catch {
+      this.palettes = [];
+    }
   }
 
   get favorites() {
-    return JSON.parse(window.localStorage.getItem(FAVORITES_KEY));
+    try {
+      return JSON.parse(window.localStorage.getItem(FAVORITES_KEY));
+    } catch {
+      this.favorites = [];
+      return this.favorites;
+    }
   }
 
   set favorites(newValue) {
-    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(newValue));
+    try {
+      window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(newValue));
+    } catch {
+      this.favorites = [];
+    }
+  }
+
+  _validateColorValues() {
+    [ RED_KEY, GREEN_KEY, BLUE_KEY].forEach(key => {
+      if (!this[key]) this[key] = 0;
+      if (!parseInt(this[key])) this[key] = 0;
+      if (this[key] < 0 || this[key] > 255) this[key] = 0;
+    });
   }
 
   addPalette(newPalette) {
@@ -120,7 +160,11 @@ export default class StoreManager {
 
   removeColorFromPalette(color, paletteName) {
     const palettes = this.palettes;
-    const palette = palettes.filter(p => p.name === paletteName)[0];
+    const found = palettes.filter(p => p.name === paletteName);
+    if (found.length === 0) {
+      return null;
+    }
+    const palette = found[0];
     palette.colors.splice(palette.colors.indexOf(color), 1);
     palettes.splice(palettes.indexOf(palette), 1, palette);
     this.palettes = palettes;

@@ -347,7 +347,7 @@ class App extends React.Component {
     this.setState({
       palettes: this._storeManager.palettes,
     });
-    if (this._paletteView) {
+    if (this._paletteView && updatedPalette) {
       this._paletteView.update(updatedPalette);
     }
   }
