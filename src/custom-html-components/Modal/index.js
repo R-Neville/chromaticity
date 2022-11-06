@@ -14,7 +14,7 @@ class Modal extends HTMLElement {
     this._input = null;
     this._selector = null;
     this._selection = null;
-    this._actions = [];
+    this._actions = null;
 
     this._contentWrapper = document.createElement("div");
     this._header = document.createElement("div");
